@@ -41,7 +41,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Clusterers\IClusterer.cs" />
-    <Compile Include="Core\Attribute.cs" />
+    <Compile Include="Clusterers\KMeans.cs" />
+    <Compile Include="Core\InstanceAttribute.cs" />
     <Compile Include="Core\Instance.cs" />
     <Compile Include="Core\Instances.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

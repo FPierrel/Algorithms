@@ -11,7 +11,7 @@ namespace MachineLearning.Core
     /// </summary>
     public class Instance
     {
-        public List<Attribute> Attributes { get; set; }
+        public List<InstanceAttribute> Attributes { get; set; }
     }
 }
  

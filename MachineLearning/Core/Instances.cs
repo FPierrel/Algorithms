@@ -9,7 +9,7 @@ namespace MachineLearning.Core
     /// <summary>
     /// 
     /// </summary>
-    class Instances
+    public class Instances
     {
         /// <summary>
         /// The instances
@@ -19,7 +19,7 @@ namespace MachineLearning.Core
         /// <summary>
         /// The attribute information.
         /// </summary>
-        public List<Attribute> Attributes { get; set; }
+        public List<InstanceAttribute> Attributes { get; set; }
 
         /// <summary>
         /// The class attribute's index.

@@ -8,7 +8,7 @@ using MachineLearning.Core;
 
 namespace MachineLearning.Clusterers
 {
-    interface IClusterer
+    public interface IClusterer
     {
         /// <summary>
         /// Generate a clusterer
@@ -31,8 +31,13 @@ namespace MachineLearning.Clusterers
         double[] DistributionForInstance(Instance instance);
 
         /// <summary>
-        /// Returns the number of cluster
+        /// Returns the number of clusters
         /// </summary>
         int NumberOfClusters { get; }       
+
+        /// <summary>
+        /// Returns clusters
+        /// </summary>
+        Instances Clusters { get; }
     }
 }
