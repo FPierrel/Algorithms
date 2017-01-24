@@ -40,7 +40,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Clusterers\Clusterer.cs" />
+    <Compile Include="Clusterers\IClusterer.cs" />
     <Compile Include="Core\Attribute.cs" />
     <Compile Include="Core\Instance.cs" />
     <Compile Include="Core\Instances.cs" />
