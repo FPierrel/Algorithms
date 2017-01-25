@@ -11,17 +11,16 @@ namespace MachineLearning.Clusterers
     public interface IClusterer
     {
         /// <summary>
-        /// Generate a clusterer
-        /// </summary>
-        /// <param name="data">Set of instance serving as training data</param>
-        void BuildClusterer(Instances data);
-
-        /// <summary>
         /// Classifies a given instance
         /// </summary>
         /// <param name="instance">Instance to be assigned a cluster</param>
         /// <returns>The number of the assigned cluster</returns>
         int ClusterInstance(Instance instance);
+
+        /// <summary>
+        /// Build the clusterer
+        /// </summary>
+        void Build();
 
         /// <summary>
         /// Predicts the cluster membership for a given instance.

@@ -45,6 +45,8 @@
     <Compile Include="Core\InstanceAttribute.cs" />
     <Compile Include="Core\Instance.cs" />
     <Compile Include="Core\Instances.cs" />
+    <Compile Include="Exceptions\BadClusterDimensionException.cs" />
+    <Compile Include="Exceptions\WrongClustersNumberException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
