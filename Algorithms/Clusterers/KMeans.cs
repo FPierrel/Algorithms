@@ -125,7 +125,7 @@ namespace MachineLearning.Clusterers
                 {
                     if (attr.AttributeType == AttributeType.Numeric)
                     {
-                        this._instances[i, j] = attr.DoubleValue;
+                        this._instances[i, dim] = attr.DoubleValue;
                         dim++;
                     }             
                 }
