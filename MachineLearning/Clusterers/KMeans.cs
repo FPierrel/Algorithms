@@ -25,8 +25,8 @@ namespace MachineLearning.Clusterers
         // Dimension of cluster position
         private int _clusterDim;
 
-        // _clusters[cluster][dim]
-        private double[][] _clusters;
+        // Dim1 -> cluster, Dim2 -> dimension
+        private double[,] _clusters;
 
         /// <summary>
         /// Returns the sets of clusters
@@ -38,21 +38,21 @@ namespace MachineLearning.Clusterers
                 var instances = new Instances();
                 instances.Attributes = this._dataSet.Attributes;
 
-                foreach (var cluster in _clusters)
+                for (int i = 0; i < this._nbClusters; i++)
                 {
-                    int i = 0;
                     Instance instance = new Instance();
+                    int j = 0;
                     foreach (var attribute in instances.Attributes)
-                    {
+                    {                         
                         if (attribute.AttributeType == AttributeType.Numeric)
                         {
                             // set the cluster position
                             instance.Attributes.Add(new InstanceAttribute
                             {
                                 AttributeType = AttributeType.Numeric,
-                                DoubleValue = cluster[i]
+                                DoubleValue = this._clusters[i, j]
                             });
-                            i++;
+                            j++;
                         }
                         else
                         {
@@ -83,7 +83,7 @@ namespace MachineLearning.Clusterers
             throw new NotImplementedException();
         }
 
-        public KMeans(Instances dataSet, double[][] initClusters = null, int? nbClusters = null, int? maxIter = null)
+        public KMeans(Instances dataSet, double[,] initClusters = null, int? nbClusters = null, int? maxIter = null)
         {
             this._dataSet = dataSet;
             this._clusterDim = dataSet.Attributes.Where(a => a.AttributeType == AttributeType.Numeric).Count();
@@ -101,7 +101,7 @@ namespace MachineLearning.Clusterers
             {
                 this._nbClusters = initClusters.Length;
                 this._clusters = initClusters;
-                if (initClusters[0].Length != this._clusterDim)
+                if (initClusters.GetLength(0) != this._clusterDim)
                 {
                     throw new BadClusterDimensionException();
                 }
@@ -109,6 +109,7 @@ namespace MachineLearning.Clusterers
             else
             {
                 this._nbClusters = nbClusters.HasValue ? nbClusters.Value : DEFAULT_NB_CLUSTERS;
+                this._clusters = new double[this._nbClusters,_clusterDim];
                 this.initClusters();
             }
 
@@ -120,7 +121,7 @@ namespace MachineLearning.Clusterers
             const int MIN = 0;
             const int MAX = 1;
 
-            double[,] bounds = new double[_clusterDim,1]; // bound[,0] -> min, bound[,1] -> max
+            double[,] bounds = new double[_clusterDim,2]; // bound[,0] -> min, bound[,1] -> max
 
             for (int i = 0; i < _clusterDim; i++)
             {
@@ -152,7 +153,7 @@ namespace MachineLearning.Clusterers
             {
                 for (int j = 0; j < this._clusterDim; j++)
                 {
-                    this._clusters[i][j] = random.NextDouble() * (bounds[j,MAX] - bounds[j,MIN]) + bounds[j,MIN];
+                    this._clusters[i,j] = random.NextDouble() * (bounds[j,MAX] - bounds[j,MIN]) + bounds[j,MIN];
                 }
             }
 
