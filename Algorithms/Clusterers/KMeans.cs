@@ -10,13 +10,14 @@ namespace MachineLearning.Clusterers
 {
     public class KMeans : IClusterer
     {
+        #region Private variables
         // Default cluster number
         private const int DEFAULT_NB_CLUSTERS = 4;
 
         // Maximum iteration number (if defined)
         private int? _maxIter;
 
-        // Dataset
+        // Initial dataset
         private Instances _dataSet;
 
         // Number of cluster
@@ -28,6 +29,14 @@ namespace MachineLearning.Clusterers
         // Dim1 -> cluster, Dim2 -> dimension
         private double[,] _clusters;
 
+        // Dim1 -> cluster, Dim2 -> dimension
+        private double[,] _instances;
+
+        // instance assignation
+        private int[] _assignation;
+        #endregion
+
+        #region Properties
         /// <summary>
         /// Returns the sets of clusters
         /// </summary>
@@ -63,7 +72,7 @@ namespace MachineLearning.Clusterers
 
                 return instances;
             }
-        }
+        }        
 
         public int NumberOfClusters
         {
@@ -72,17 +81,9 @@ namespace MachineLearning.Clusterers
                 return _nbClusters;
             }
         }
+        #endregion
 
-        public int ClusterInstance(Instance instance)
-        {
-            throw new NotImplementedException();
-        }
-
-        public double[] DistributionForInstance(Instance instance)
-        {
-            throw new NotImplementedException();
-        }
-
+        #region Constructors
         public KMeans(Instances dataSet, double[,] initClusters = null, int? nbClusters = null, int? maxIter = null)
         {
             this._dataSet = dataSet;
@@ -114,8 +115,43 @@ namespace MachineLearning.Clusterers
             }
 
             this._maxIter = maxIter;
+
+            //Private variable initilization
+            this._instances = new double[this._nbClusters, this._clusterDim];
+            for (int i = 0; i < this._dataSet.DataSet.Count; i++)
+            {
+                int dim = 0;
+                foreach (var attr in this._dataSet.DataSet[i].Attributes)
+                {
+                    if (attr.AttributeType == AttributeType.Numeric)
+                    {
+                        this._instances[i, j] = attr.DoubleValue;
+                        dim++;
+                    }             
+                }
+            }
+            this._assignation = new int[_nbClusters];
+        }
+        #endregion
+
+        #region Public methods
+        public void Build()
+        {
+            throw new NotImplementedException();
         }
 
+        public int ClusterInstance(Instance instance)
+        {
+            throw new NotImplementedException();
+        }
+
+        public double[] DistributionForInstance(Instance instance)
+        {
+            throw new NotImplementedException();
+        }
+        #endregion
+
+        #region Private method
         private void initClusters()
         {
             const int MIN = 0;
@@ -159,9 +195,36 @@ namespace MachineLearning.Clusterers
 
         }
 
-        public void Build()
+        private void assignCluster()
         {
-            throw new NotImplementedException();
+            // For each instance
+            for(int instanceId = 0; instanceId < this._instances.GetLength(0); instanceId++)
+            {
+                int cluster = -1;
+                double distanceMin = double.MaxValue;
+                
+                // Search the closest cluster
+                for (int clusterId = 0; clusterId < this._nbClusters; clusterId++)
+                {
+                    double distance = 0;
+                    for (int dim = 0; dim < _clusterDim; dim++)
+                    {
+                        distance += Math.Pow(_instances[clusterId, dim] - _clusters[clusterId, dim],2);
+                        // Sqrt is useless in this case (distance is used only for comparison)
+                    }
+                    
+                    //It's the closest
+                    if (distance < distanceMin)
+                    {
+                        distanceMin = distance;
+                        cluster = clusterId;
+                    }
+                }
+                this._assignation[instanceId] = cluster;
+            }
         }
+
+        
+        #endregion
     }
 }
