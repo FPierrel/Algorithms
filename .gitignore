@@ -2,5 +2,7 @@
 # This .gitignore file was automatically created by Microsoft(R) Visual Studio.
 ################################################################################
 
-/MachineLearning/obj/Debug
-/.vs/MachineLearning/v14
+/Algorithms/obj/Debug
+/.vs/Algorithms/v14
+/.Algorithms.sln.un~
+/Algorithms.sln~
