@@ -37,6 +37,6 @@ namespace MachineLearning.Clusterers
         /// <summary>
         /// Returns clusters
         /// </summary>
-        Instances Clusters { get; }
+        Instances Centroids { get; }
     }
 }

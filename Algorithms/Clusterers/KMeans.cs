@@ -23,11 +23,12 @@ namespace MachineLearning.Clusterers
         // Number of cluster
         private int _nbClusters;
 
-        // Dimension of cluster position
-        private int _clusterDim;
+        // Dimension of centroid position
+        private int _centroidDim;
 
+        // Centroids position
         // Dim1 -> cluster, Dim2 -> dimension
-        private double[,] _clusters;
+        private double[,] _centroids;
 
         // Dim1 -> cluster, Dim2 -> dimension
         private double[,] _instances;
@@ -38,9 +39,9 @@ namespace MachineLearning.Clusterers
 
         #region Properties
         /// <summary>
-        /// Returns the sets of clusters
+        /// Returns the sets of centroids
         /// </summary>
-        public Instances Clusters
+        public Instances Centroids
         {
             get
             {
@@ -55,11 +56,11 @@ namespace MachineLearning.Clusterers
                     {                         
                         if (attribute.AttributeType == AttributeType.Numeric)
                         {
-                            // set the cluster position
+                            // set the centroids
                             instance.Attributes.Add(new InstanceAttribute
                             {
                                 AttributeType = AttributeType.Numeric,
-                                DoubleValue = this._clusters[i, j]
+                                DoubleValue = this._centroids[i, j]
                             });
                             j++;
                         }
@@ -84,25 +85,25 @@ namespace MachineLearning.Clusterers
         #endregion
 
         #region Constructors
-        public KMeans(Instances dataSet, double[,] initClusters = null, int? nbClusters = null, int? maxIter = null)
+        public KMeans(Instances dataSet, double[,] initClustersPosition = null, int? nbClusters = null, int? maxIter = null)
         {
             this._dataSet = dataSet;
-            this._clusterDim = dataSet.Attributes.Where(a => a.AttributeType == AttributeType.Numeric).Count();
+            this._centroidDim = dataSet.Attributes.Where(a => a.AttributeType == AttributeType.Numeric).Count();
 
-            if (initClusters != null && nbClusters != null)
+            if (initClustersPosition != null && nbClusters != null)
             {
-                if (nbClusters != initClusters.Length)
+                if (nbClusters != initClustersPosition.Length)
                 {
                     throw new WrongClustersNumberException();
                 }
 
-                this._clusters = initClusters;
+                this._centroids = initClustersPosition;
             }              
-            else if (initClusters != null)
+            else if (initClustersPosition != null)
             {
-                this._nbClusters = initClusters.Length;
-                this._clusters = initClusters;
-                if (initClusters.GetLength(0) != this._clusterDim)
+                this._nbClusters = initClustersPosition.Length;
+                this._centroids = initClustersPosition;
+                if (initClustersPosition.GetLength(0) != this._centroidDim)
                 {
                     throw new BadClusterDimensionException();
                 }
@@ -110,14 +111,14 @@ namespace MachineLearning.Clusterers
             else
             {
                 this._nbClusters = nbClusters.HasValue ? nbClusters.Value : DEFAULT_NB_CLUSTERS;
-                this._clusters = new double[this._nbClusters,_clusterDim];
-                this.initClusters();
+                this._centroids = new double[this._nbClusters,_centroidDim];
+                this.initCentroids();
             }
 
             this._maxIter = maxIter;
 
             //Private variable initilization
-            this._instances = new double[this._nbClusters, this._clusterDim];
+            this._instances = new double[this._nbClusters, this._centroidDim];
             for (int i = 0; i < this._dataSet.DataSet.Count; i++)
             {
                 int dim = 0;
@@ -151,15 +152,15 @@ namespace MachineLearning.Clusterers
         }
         #endregion
 
-        #region Private method
-        private void initClusters()
+        #region Private methods
+        private void initCentroids()
         {
             const int MIN = 0;
             const int MAX = 1;
 
-            double[,] bounds = new double[_clusterDim,2]; // bound[,0] -> min, bound[,1] -> max
+            double[,] bounds = new double[_centroidDim,2]; // bound[,0] -> min, bound[,1] -> max
 
-            for (int i = 0; i < _clusterDim; i++)
+            for (int i = 0; i < _centroidDim; i++)
             {
                 bounds[i, MIN] = Double.MaxValue;
                 bounds[i, MAX] = Double.MinValue;
@@ -187,9 +188,9 @@ namespace MachineLearning.Clusterers
             // set cluster position
             for (int i = 0; i < this._nbClusters; i++)
             {
-                for (int j = 0; j < this._clusterDim; j++)
+                for (int j = 0; j < this._centroidDim; j++)
                 {
-                    this._clusters[i,j] = random.NextDouble() * (bounds[j,MAX] - bounds[j,MIN]) + bounds[j,MIN];
+                    this._centroids[i,j] = random.NextDouble() * (bounds[j,MAX] - bounds[j,MIN]) + bounds[j,MIN];
                 }
             }
 
@@ -207,9 +208,9 @@ namespace MachineLearning.Clusterers
                 for (int clusterId = 0; clusterId < this._nbClusters; clusterId++)
                 {
                     double distance = 0;
-                    for (int dim = 0; dim < _clusterDim; dim++)
+                    for (int dim = 0; dim < _centroidDim; dim++)
                     {
-                        distance += Math.Pow(_instances[clusterId, dim] - _clusters[clusterId, dim],2);
+                        distance += Math.Pow(_instances[clusterId, dim] - _centroids[clusterId, dim],2);
                         // Sqrt is useless in this case (distance is used only for comparison)
                     }
                     
@@ -224,7 +225,44 @@ namespace MachineLearning.Clusterers
             }
         }
 
-        
+        /// <summary>
+        /// Updates the centroid
+        /// </summary>
+        /// <returns>True if the centroids were Updated</returns>
+        private bool UpdateCentroids()
+        {
+            bool centroidUpdated = false;
+
+            // for each centroids
+            for (int clusterId = 0; clusterId < this._nbClusters; clusterId++)
+            {   
+                // for each dimension
+                for (int dim = 0; dim < this._centroidDim; dim++)
+                {
+                    double sum = 0.0;
+                    int clusterSize = 0;
+                    
+                    // for each instance of this cluster
+                    for (int instanceId = 0; instanceId < this._instances.GetLength(0); instanceId++)
+                    {
+                        if (this._assignation[instanceId] == clusterId)
+                        {
+                            clusterSize++;
+                            sum += _instances[instanceId, dim];
+                        }
+                    }
+
+                    double position = sum / clusterSize;
+
+                    if (this._centroids[clusterId, dim] != position)
+                        centroidUpdated = true;
+                    else
+                        this._centroids[clusterId,dim] = sum / clusterSize;
+                }
+            }
+
+            return centroidUpdated;
+        }
         #endregion
     }
 }
