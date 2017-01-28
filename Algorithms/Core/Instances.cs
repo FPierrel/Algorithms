@@ -30,5 +30,11 @@ namespace MachineLearning.Core
         /// DataSet name
         /// </summary>
         public string Name { get; set; }
+        
+        public Instances()
+        {
+            this.Attributes = new List<InstanceAttribute>();
+            this.DataSet = new List<Instance>();
+        }
     }
 }

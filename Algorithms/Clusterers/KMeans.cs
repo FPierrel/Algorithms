@@ -17,9 +17,9 @@ namespace MachineLearning.Clusterers
         // Maximum iteration number (if defined)
         private int? _maxIter;
 
-        // Initial dataset
+        // Dataset
         private Instances _dataSet;
-
+        
         // Number of cluster
         private int _nbClusters;
 
@@ -38,6 +38,19 @@ namespace MachineLearning.Clusterers
         #endregion
 
         #region Properties
+
+        /// <summary>
+        /// Get the clusterized dataset
+        /// </summary>
+        public Instances DataSet
+        {
+            get
+            {
+                this.assignClusterToDataset();
+                return this._dataSet;
+            }
+        }
+
         /// <summary>
         /// Returns the sets of centroids
         /// </summary>
@@ -69,11 +82,12 @@ namespace MachineLearning.Clusterers
                             instance.Attributes.Add(attribute.Clone());
                         }
                     }
+                    instance.Attributes[instances.ClassIndex].DoubleValue = i;
                 }
 
                 return instances;
             }
-        }        
+        }
 
         public int NumberOfClusters
         {
@@ -85,25 +99,25 @@ namespace MachineLearning.Clusterers
         #endregion
 
         #region Constructors
-        public KMeans(Instances dataSet, double[,] initClustersPosition = null, int? nbClusters = null, int? maxIter = null)
+        public KMeans(Instances dataSet, double[,] initCentroids = null, int? nbClusters = null, int? maxIter = null)
         {
             this._dataSet = dataSet;
             this._centroidDim = dataSet.Attributes.Where(a => a.AttributeType == AttributeType.Numeric).Count();
 
-            if (initClustersPosition != null && nbClusters != null)
+            if (initCentroids != null && nbClusters != null)
             {
-                if (nbClusters != initClustersPosition.Length)
+                if (nbClusters != initCentroids.Length)
                 {
                     throw new WrongClustersNumberException();
                 }
 
-                this._centroids = initClustersPosition;
+                this._centroids = initCentroids;
             }              
-            else if (initClustersPosition != null)
+            else if (initCentroids != null)
             {
-                this._nbClusters = initClustersPosition.Length;
-                this._centroids = initClustersPosition;
-                if (initClustersPosition.GetLength(0) != this._centroidDim)
+                this._nbClusters = initCentroids.Length;
+                this._centroids = initCentroids;
+                if (initCentroids.GetLength(0) != this._centroidDim)
                 {
                     throw new BadClusterDimensionException();
                 }
@@ -136,9 +150,33 @@ namespace MachineLearning.Clusterers
         #endregion
 
         #region Public methods
+
+        /// <summary>
+        /// Build clusterer
+        /// </summary>
         public void Build()
         {
-            throw new NotImplementedException();
+            int iteration = 0;
+            while (true)
+            {
+                if (!this.Iteration())
+                    break;
+
+                iteration++;
+                if (this._maxIter.HasValue)
+                    if (iteration >= this._maxIter)
+                        break;
+            }
+        }
+
+        /// <summary>
+        /// Performs an iteration. (   
+        /// </summary>
+        /// <returns></returns>
+        public bool Iteration()
+        {
+            this.assignCluster();
+            return (this.updateCentroids());
         }
 
         public int ClusterInstance(Instance instance)
@@ -196,6 +234,9 @@ namespace MachineLearning.Clusterers
 
         }
 
+        /// <summary>
+        /// Assign a cluster to each instance
+        /// </summary>
         private void assignCluster()
         {
             // For each instance
@@ -229,7 +270,7 @@ namespace MachineLearning.Clusterers
         /// Updates the centroid
         /// </summary>
         /// <returns>True if the centroids were Updated</returns>
-        private bool UpdateCentroids()
+        private bool updateCentroids()
         {
             bool centroidUpdated = false;
 
@@ -263,6 +304,14 @@ namespace MachineLearning.Clusterers
 
             return centroidUpdated;
         }
+
+        private void assignClusterToDataset()
+        {
+            for (int instanceId = 0; instanceId < this._dataSet.DataSet.Count; instanceId++)
+            {
+                this._dataSet.Attributes[this._dataSet.ClassIndex].DoubleValue = instanceId;
+            }
+        }                
         #endregion
     }
 }

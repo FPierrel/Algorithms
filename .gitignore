@@ -6,3 +6,6 @@
 /.vs/Algorithms/v14
 /.Algorithms.sln.un~
 /Algorithms.sln~
+/Algorithms/bin/Debug
+/Examples/KMeans2D/bin/Debug
+/Examples/KMeans2D/obj/Debug
