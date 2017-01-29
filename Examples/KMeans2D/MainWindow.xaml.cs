@@ -186,30 +186,34 @@ namespace KMeans2D
 
                 instances.DataSet.Add(instance);
             }
-
-            // Init centroids
-            double maxX = Cnva.ActualWidth;
-            double maxY = Cnva.ActualHeight;
-            Random random = new Random();
-            int nbCluster = int.Parse(TbClusterNb.Text) > this._centroid.Count ?
-                int.Parse(TbClusterNb.Text) : this._centroid.Count;
-            double[,] centroids = new double[nbCluster, 2];
-
-            for (int i = 0; i < nbCluster; i++)
+                        
+            if (TbClusterNb.Text != "" || this._centroid.Count != 0)
             {
-                if(i < this._centroid.Count)
-                {
-                    centroids[i,0] = this._centroid[i].X;
-                    centroids[i,1] = this._centroid[i].Y;
-                }
-                else
-                {
-                    centroids[i,0] = random.NextDouble() * maxX;
-                    centroids[i,1] = random.NextDouble() * maxY;
-                }
-            }
+                // Init centroids
+                double maxX = Cnva.ActualWidth;
+                double maxY = Cnva.ActualHeight;
+                Random random = new Random();
 
-            return new KMeans(instances,centroids);
+                int nbCluster = int.Parse(TbClusterNb.Text) > this._centroid.Count ?
+                    int.Parse(TbClusterNb.Text) : this._centroid.Count;
+                double[,] centroids = new double[nbCluster, 2];
+
+                for (int i = 0; i < nbCluster; i++)
+                {
+                    if (i < this._centroid.Count)
+                    {
+                        centroids[i, 0] = this._centroid[i].X;
+                        centroids[i, 1] = this._centroid[i].Y;
+                    }
+                    else
+                    {
+                        centroids[i, 0] = random.NextDouble() * maxX;
+                        centroids[i, 1] = random.NextDouble() * maxY;
+                    }
+                }
+                return new KMeans(instances, centroids);
+            }
+            return new KMeans(instances);            
         }
 
         private void updateCanvas(Instances instances, Instances centroids)
