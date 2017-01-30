@@ -60,6 +60,7 @@ namespace MachineLearning.Clusterers
             {
                 var instances = new Instances();
                 instances.Attributes = this._dataSet.Attributes;
+                instances.ClassIndex = this._dataSet.ClassIndex;
 
                 for (int i = 0; i < this._nbClusters; i++)
                 {
@@ -83,6 +84,7 @@ namespace MachineLearning.Clusterers
                         }
                     }
                     instance.Attributes[instances.ClassIndex].DoubleValue = i;
+                    instances.DataSet.Add(instance);
                 }
 
                 return instances;
@@ -115,9 +117,9 @@ namespace MachineLearning.Clusterers
             }              
             else if (initCentroids != null)
             {
-                this._nbClusters = initCentroids.Length;
+                this._nbClusters = initCentroids.GetLength(0);
                 this._centroids = initCentroids;
-                if (initCentroids.GetLength(0) != this._centroidDim)
+                if (initCentroids.GetLength(1) != this._centroidDim)
                 {
                     throw new BadClusterDimensionException();
                 }
@@ -132,7 +134,7 @@ namespace MachineLearning.Clusterers
             this._maxIter = maxIter;
 
             //Private variable initilization
-            this._instances = new double[this._nbClusters, this._centroidDim];
+            this._instances = new double[this._dataSet.DataSet.Count, this._centroidDim];
             for (int i = 0; i < this._dataSet.DataSet.Count; i++)
             {
                 int dim = 0;
@@ -145,7 +147,7 @@ namespace MachineLearning.Clusterers
                     }             
                 }
             }
-            this._assignation = new int[_nbClusters];
+            this._assignation = new int[this._dataSet.DataSet.Count];
         }
         #endregion
 
@@ -251,7 +253,7 @@ namespace MachineLearning.Clusterers
                     double distance = 0;
                     for (int dim = 0; dim < _centroidDim; dim++)
                     {
-                        distance += Math.Pow(_instances[clusterId, dim] - _centroids[clusterId, dim],2);
+                        distance += Math.Pow(_instances[instanceId, dim] - _centroids[clusterId, dim],2);
                         // Sqrt is useless in this case (distance is used only for comparison)
                     }
                     
@@ -296,9 +298,10 @@ namespace MachineLearning.Clusterers
                     double position = sum / clusterSize;
 
                     if (this._centroids[clusterId, dim] != position)
+                    {
                         centroidUpdated = true;
-                    else
-                        this._centroids[clusterId,dim] = sum / clusterSize;
+                        this._centroids[clusterId, dim] = position;
+                    }
                 }
             }
 
@@ -309,7 +312,7 @@ namespace MachineLearning.Clusterers
         {
             for (int instanceId = 0; instanceId < this._dataSet.DataSet.Count; instanceId++)
             {
-                this._dataSet.Attributes[this._dataSet.ClassIndex].DoubleValue = instanceId;
+                this._dataSet.DataSet[instanceId].Attributes[this._dataSet.ClassIndex].DoubleValue = this._assignation[instanceId];
             }
         }                
         #endregion

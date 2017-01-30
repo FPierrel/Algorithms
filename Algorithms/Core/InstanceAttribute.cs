@@ -32,6 +32,7 @@ namespace MachineLearning.Core
     public class InstanceAttribute
     {
         public AttributeType AttributeType { get; set; }
+        
 
         private string _internalString;
         private double _internalDouble;
@@ -60,7 +61,19 @@ namespace MachineLearning.Core
             }
             set
             {
-                this._internalString = value;
+                if (AttributeType == AttributeType.String || AttributeType == AttributeType.Nominal)
+                {
+                    this._internalString = value;
+                }
+                else if (AttributeType == AttributeType.Numeric)
+                {
+                    double val;
+                    this._internalDouble = Double.TryParse(value, out val) ? val : 0.0;
+                }
+                else if (AttributeType == AttributeType.Date)
+                {
+                    this._internalDate = DateTime.Parse(value);
+                }
             }
         }
 
@@ -79,7 +92,7 @@ namespace MachineLearning.Core
                 }
                 else if (AttributeType == AttributeType.Date)
                 {
-                    return this._internalDate.ToFileTimeUtc();
+                    return this._internalDate.Ticks;
                 }
                 else
                 {
@@ -88,7 +101,18 @@ namespace MachineLearning.Core
             }
             set
             {
-                this._internalDouble = value;
+                if (AttributeType == AttributeType.String || AttributeType == AttributeType.Nominal)
+                {
+                    this._internalString = "" + value;
+                }
+                else if (AttributeType == AttributeType.Numeric)
+                {
+                    this._internalDouble = value;
+                }
+                else if (AttributeType == AttributeType.Date)
+                {
+                    this._internalDate = new DateTime((long)value);
+                }
             }
         }
         public DateTime DateValue
@@ -114,7 +138,18 @@ namespace MachineLearning.Core
             }
             set
             {
-                this._internalDate = value;
+                if (AttributeType == AttributeType.String || AttributeType == AttributeType.Nominal)
+                {
+                    this._internalString = value.ToString();
+                }
+                else if (AttributeType == AttributeType.Numeric)
+                {
+                    this._internalDouble = value.Ticks;
+                }
+                else if (AttributeType == AttributeType.Date)
+                {
+                    this._internalDate = value;
+                }
             }
         }
 

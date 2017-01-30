@@ -24,8 +24,7 @@
             <Button Name="BtnReset" Grid.Column="0" Click="BtnReset_Click" >Reset</Button>
             <Label Grid.Column="1">Number of cluster (8 max):</Label>
             <TextBox Name="TbClusterNb" Grid.Column="2" PreviewTextInput="TbClusterNb_PreviewTextInput" TextChanged="TbClusterNb_TextChanged"></TextBox>
-            <Button Name="BtnAuto" Grid.Column="3">Auto</Button>
-            <Button Name="BtnPause" Grid.Column="4">Pause</Button>
+            <Button Name="BtnAuto" Grid.Column="3" Click="BtnAuto_Click">Auto</Button>
             <Button Name="BtnIterate" Grid.Column="5" Click="BtnIterate_Click">Iterate</Button>
         </Grid>
         <Label Grid.Row="1" Background="Gray">Left click to add points to cluster, right click to add centroids (or do not add to randomize them)</Label>

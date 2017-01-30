@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -82,7 +83,7 @@ namespace KMeans2D
                 TbClusterNb.Text = "" + _nbClusterOnScreen;    
         }
                 
-        private void AddEllipse(Canvas canvas, double x, double y, Color color, double height = 10, double width = 10)
+        private void AddEllipse(Canvas canvas, double x, double y, Color color, double height = 5, double width = 5)
         {
             Ellipse ellipse = new Ellipse();
             SolidColorBrush brush = new SolidColorBrush();
@@ -137,7 +138,8 @@ namespace KMeans2D
             this._nbClusterOnScreen = 0;
             this._nbIteration = 0;
             this._points = new List<Point>();
-            this._centroid = new List<Point>();            
+            this._centroid = new List<Point>();
+            TbClusterNb.Text = "0";            
         }
 
         private void TbClusterNb_TextChanged(object sender, TextChangedEventArgs e)
@@ -159,6 +161,18 @@ namespace KMeans2D
             if (!this._kmeans.Iteration())
                 MessageBox.Show("KMeans finished", "Info");
             this._nbIteration++;
+            this.updateCanvas(this._kmeans.DataSet, this._kmeans.Centroids);
+        }
+
+        private void BtnAuto_Click(object sender, RoutedEventArgs e)
+        {
+            //first iteration            
+            this._kmeans = this.initKmeans();
+
+            while (this._kmeans.Iteration())
+                ;
+
+            MessageBox.Show("KMeans finished", "Info");
             this.updateCanvas(this._kmeans.DataSet, this._kmeans.Centroids);
         }
 
@@ -218,6 +232,8 @@ namespace KMeans2D
 
         private void updateCanvas(Instances instances, Instances centroids)
         {
+            Cnva.Children.Clear();
+
             foreach (var instance in instances.DataSet)
             {
                 this.AddEllipse(
@@ -235,6 +251,7 @@ namespace KMeans2D
                     centroid.Attributes[1].DoubleValue, // y
                     this._clusterColor[(int)centroid.Attributes[2].DoubleValue]);                    
             }
+            Cnva.UpdateLayout();
         }
     }
 }

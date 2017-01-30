@@ -12,6 +12,11 @@ namespace MachineLearning.Core
     public class Instance
     {
         public List<InstanceAttribute> Attributes { get; set; }
+
+        public Instance()
+        {
+            this.Attributes = new List<InstanceAttribute>();
+        }
     }
 }
  
